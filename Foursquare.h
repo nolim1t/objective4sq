@@ -1,6 +1,6 @@
 //
 //  Foursquare.h
-//  foursquarephotos
+//  Objective4sq
 //
 //  Created by Barry Teoh on 12/25/10.
 //  Copyright 2010 / 2011 Totally Awesome Development Ltd. All rights reserved.
