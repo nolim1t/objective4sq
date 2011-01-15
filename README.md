@@ -11,6 +11,22 @@ a previous "Oauth Dance".
 
 Future releases will also fetch a token, and contain more functionality.
 
+External Dependancies
+---------------------
+
+Here are the libraries used by this Class
+
+* ASIHTTPRequest (Drop into the project)
+* json-framework (Drop into the project)
+* CoreLocation (Apple Official)
+
+TODO List
+---------------------
+
+* Add Initial steps to grab OAuth Token
+* Add more endpoints :)
+
+
 How to use
 ---------------------
 **Initializing the object and setting the delegate**
