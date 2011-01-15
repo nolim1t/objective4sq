@@ -1,0 +1,22 @@
+# build directory
+*.pbxuser
+*.mode1v3
+*.pbxtree
+*.dep
+*.dat
+# SVN directory
+.svn
+#build Dir
+build
+# OS X stuff
+.DS_Store
+profile
+# Ruby on rails stuff
+log/*
+tmp/**/*
+db/*.sqlite3
+doc/*
+doc/api
+doc/app
+doc/api/*
+doc/app/*
