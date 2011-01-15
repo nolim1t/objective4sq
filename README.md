@@ -33,11 +33,12 @@ How to use
     [test_loc release];
 	
 **Implementing the delegate**
+
 There are 3 main methods which you will need to implement.
 
-   -(void) FoursquareStartRequest;
-   -(void) FoursquareFinishedRequest; 
-   -(void) FoursquareRequestError;
+    -(void) FoursquareStartRequest;
+    -(void) FoursquareFinishedRequest; 
+    -(void) FoursquareRequestError;
 
 Each method (Except for the error one in some circumstances) will write to the following instance variables:
 
