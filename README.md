@@ -50,3 +50,9 @@ All methods will write to the following:
     NSString *LastStatus; // last status (either: success_ok or success_err)
     NSString *LastStatusReason; // Last status reason (Plain english reason of why the request failed)
 
+Compiler preprocessor directives
+---------------------
+
+**_DEBUG** This will turn on all the NSLog statements
+**_ILOVESPAM** This will print the complete response returned from the service (Serialized as a dictionary)
+
