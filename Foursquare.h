@@ -58,6 +58,8 @@
 	NSString *lastEndPoint;
 	NSString *LastStatus;
 	NSString *LastStatusReason;
+	
+	UIBackgroundTaskIdentifier background_job;
 }
 @property (nonatomic, assign) id delegate;
 @property (nonatomic, retain) NSDictionary *dictLastRequest;
@@ -65,6 +67,7 @@
 @property (nonatomic, retain) NSString *lastStatus;
 @property (nonatomic, retain) NSString *lastStatusReason;
 
+-(void) showNearestVenuesByLocation:(CLLocation *)myloc WithSearchTerm:(NSString *)term;
 -(void) showTodosByLocation:(CLLocation *)myloc;
 -(void) grabVenueListWithStartDate:(NSDate *)startDate WithEndDate:(NSDate *)endDate;
 -(void) setAccessTokenWithString:(NSString *)the_token;

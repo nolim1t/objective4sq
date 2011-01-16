@@ -36,6 +36,7 @@
 // Endpoints supported
 #define kUserTodoEndpoint @"users/self/todos"
 #define kUserCheckinHistoryEndpoint @"users/self/checkins"
+#define kVenueSearch @"venues/search"
 
 // Access token store (for storing the user's key)
 #define kAccessTokenKeyStore @"objective4sq.accesstoken"
@@ -46,6 +47,37 @@
 @synthesize lastEndPoint;
 @synthesize lastStatus;
 @synthesize lastStatusReason;
+
+#pragma mark -
+#pragma mark Async Methods
+-(void) showNearestVenuesByLocation:(CLLocation *)myloc WithSearchTerm:(NSString *)term {
+	lastEndPoint = [NSString stringWithString:kVenueSearch];
+	NSString *lat_long = [NSString stringWithFormat:@"%2.6f,%2.6f",
+						  myloc.coordinate.latitude,
+						  myloc.coordinate.longitude];
+	NSString *urlString = [NSString stringWithFormat:@"%@%@?oauth_token=%@&ll=%@",
+						   kBaseURL,
+						   kVenueSearch,
+						   [self getStoredAccessToken],
+						   lat_long
+						   ];
+	if (term != nil) {
+		urlString = [urlString stringByAppendingFormat:@"&query=%@", [term stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+	}
+	urlString = [urlString stringByAppendingFormat:@"&intent=checkin"];
+#if _DEBUG
+	NSLog(@"---");
+	NSLog(@"Foursquare->showNearestVenuesByLocation: %@ %@", [myloc description], term);
+	NSLog(@"URL: %@", urlString);
+	NSLog(@"---");	
+#endif	
+	NSURL *theURL = [NSURL URLWithString:urlString];
+	ASIHTTPRequest *theReq = [ASIHTTPRequest requestWithURL:theURL];
+	[theReq setDelegate:self];
+	[theReq startAsynchronous];
+	background_job = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{}];
+	[self.delegate FoursquareStartRequest]; // Start the show		
+}
 
 -(void) showTodosByLocation:(CLLocation *)myloc {
 	lastEndPoint = [NSString stringWithString:kUserTodoEndpoint];
@@ -68,7 +100,7 @@
 	ASIHTTPRequest *theReq = [ASIHTTPRequest requestWithURL:theURL];
 	[theReq setDelegate:self];
 	[theReq startAsynchronous];
-	
+	background_job = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{}];
 	[self.delegate FoursquareStartRequest]; // Start the show	
 }
 -(void) grabVenueListWithStartDate:(NSDate *)startDate WithEndDate:(NSDate *)endDate {
@@ -92,6 +124,7 @@
 	[theReq setDelegate:self];
 	[theReq startAsynchronous];
 	
+	background_job = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{}];
 	[self.delegate FoursquareStartRequest]; // Start the show
 }
 
@@ -122,6 +155,9 @@
 #pragma mark AsyncCallback
 - (void)requestFinished:(ASIHTTPRequest *)request
 {
+	// End background job
+	[[UIApplication sharedApplication] endBackgroundTask:background_job];
+	
 	// Use when fetching text data
 	NSString *responseString = [request responseString];
 	[self.delegate FoursquareFinishedRequest];
@@ -150,10 +186,15 @@
 
 - (void)requestFailed:(ASIHTTPRequest *)request
 {
+	// End background job
+	
+	[[UIApplication sharedApplication] endBackgroundTask:background_job];
 	NSError *error = [request error];
 #if _DEBUG
 	NSLog(@"requestFailed called. Error=%@", [error description]);
 #endif
+	lastStatus = [NSString stringWithString:@"error"];
+	lastStatusReason = [NSString stringWithString:[error description]];
 	[self.delegate FoursquareRequestError];
 }
 
