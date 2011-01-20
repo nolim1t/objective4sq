@@ -59,6 +59,8 @@
 	NSString *LastStatus;
 	NSString *LastStatusReason;
 	
+	NSString *MyConsumerKey;
+	NSString *MyConsumerSecret;
 	UIBackgroundTaskIdentifier background_job;
 }
 @property (nonatomic, assign) id delegate;
@@ -66,6 +68,15 @@
 @property (nonatomic, retain) NSString *lastEndPoint;
 @property (nonatomic, retain) NSString *lastStatus;
 @property (nonatomic, retain) NSString *lastStatusReason;
+@property (nonatomic, retain) NSString *MyConsumerKey;
+@property (nonatomic, retain) NSString *MyConsumerSecret;
+
+// Initialize this object with this function
+-(id) initWithAccessToken:(NSString *)apitoken WithAccessSecret:(NSString *)apisecret;
+// Open This URL in a UIWebView
+-(NSURL *) getOAuthURLWithRedirectHandler:(NSString *)redirectHandler;
+// Foursquare will present a code, you need to use it to get an access_token
+-(void) getAccessCodeWithRedirectHandler:(NSString *)redirectHandler WithCode:(NSString *)theCode;
 
 -(void) showNearestVenuesByLocation:(CLLocation *)myloc WithSearchTerm:(NSString *)term;
 -(void) showTodosByLocation:(CLLocation *)myloc;

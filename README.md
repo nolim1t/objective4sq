@@ -35,12 +35,17 @@ How to use
     Foursquare *foursq;
 
     // Put this in the @implementation block somewhere
-    foursq = [[Foursquare alloc] init];
+    foursq = [[Foursquare alloc] initWithAccessToken:@"YOURTOKEN" WithAccessSecret:@"YOURSECRET"];
     if ([[foursq getStoredAccessToken] length] == 0) {
-	    [foursq setAccessTokenWithString:@"The-client-access-token"];
-    }
-
+	    NSURL *oauth_url = [foursq getOAuthURLWithRedirectHandler:@"yourapphandler://verify"];
+    	// You will need to present UIWebView or something for the user
+	}
+	
     [foursq setDelegate:self]; // Set up a delegate
+	
+	// This code should be handled by the handler
+	// This is an async request. On success it will set the access token
+	[foursq getAccessCodeWithRedirectHandler:@"Needstomatch" WithCode:@"whateverthecodeis"];
 
     // Lets grab all the Foursquare for my account
     // and also assume I'm somewhere in Sydney, Australia

@@ -47,6 +47,62 @@
 @synthesize lastEndPoint;
 @synthesize lastStatus;
 @synthesize lastStatusReason;
+@synthesize MyConsumerKey;
+@synthesize MyConsumerSecret;
+
+#pragma mark -
+#pragma mark Initializer
+-(id) initWithAccessToken:(NSString *)apitoken WithAccessSecret:(NSString *)apisecret {
+#if _DEBUG
+	NSLog(@"Foursquare->initWithAccessToken %@ %@", apitoken, apisecret);
+#endif
+	self.MyConsumerKey = apitoken;
+	self.MyConsumerSecret = apisecret;
+	
+	return self;
+}
+
+#pragma mark -
+#pragma mark OAuth Dance Methods
+-(NSURL *) getOAuthURLWithRedirectHandler:(NSString *)redirectHandler {
+	if (MyConsumerKey != nil && MyConsumerSecret != nil) {
+		NSString *theURL = [NSString stringWithFormat:@"https://foursquare.com/oauth2/authenticate?client_id=%@&response_type=code&redirect_uri=%@&display=touch",
+							MyConsumerKey,
+							[redirectHandler stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding]							
+							];
+#if _DEBUG
+		NSLog(@"Foursquare->getOAuthURLWithRedirectHandler %@ => %@", redirectHandler, theURL);
+#endif
+		return [NSURL URLWithString:theURL];
+	} else {
+#if _DEBUG
+		NSLog(@"Foursquare->getOAuthURLWithRedirectHandler %@ => NIL (POTENTIAL ERROR)", redirectHandler);
+#endif		
+		return nil;
+	}
+
+}
+-(void) getAccessCodeWithRedirectHandler:(NSString *)redirectHandler WithCode:(NSString *)theCode {
+	if (MyConsumerKey != nil && MyConsumerSecret != nil) {
+		lastEndPoint = [NSString stringWithString:@"access_token"];
+		NSString *theURLString = [NSString stringWithFormat:@"https://foursquare.com/oauth2/access_token?client_id=%@&client_secret=%@&grant_type=authorization_code&redirect_uri=%@&code=%@",
+							MyConsumerKey,
+							MyConsumerSecret,
+							[redirectHandler stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding],
+							[theCode stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
+							];
+#if _DEBUG
+		NSLog(@"Foursquare->getAccessCodeWithRedirectHandler %@ %@ => %@ (Start Async Request)", redirectHandler, theCode, theURLString);
+#endif
+		NSURL *theURL = [NSURL URLWithString:theURLString];
+		ASIHTTPRequest *theReq = [ASIHTTPRequest requestWithURL:theURL];
+		[theReq setDelegate:self];
+		[theReq startAsynchronous];
+		background_job = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{}];
+		[self.delegate FoursquareStartRequest]; // Start the show		
+		
+	}
+}
 
 #pragma mark -
 #pragma mark Async Methods
@@ -172,7 +228,20 @@
 #if _DEBUG
 		NSLog(@"Status: %@\n Full Status: %@\n", lastStatus, lastStatusReason);
 #endif
-		[self.delegate FoursquareFinishedRequest];
+		if ([lastEndPoint isEqualToString:@"access_token"]) {
+			NSString *access_token = [dictLastRequest objectForKey:@"access_token"];
+			if (access_token != nil) {
+				[self setAccessTokenWithString:access_token]; // Set the Access Token
+				[self.delegate FoursquareFinishedRequest];
+			} else {
+				lastStatus = [NSString stringWithString:@"error"];
+				lastStatusReason = [NSString stringWithString:[dictLastRequest objectForKey:@"error"]];
+				[self.delegate FoursquareRequestError];
+			}
+
+		} else {
+			[self.delegate FoursquareFinishedRequest];
+		}
 	}
 	@catch (NSException * e) {
 #if _DEBUG
@@ -202,6 +271,8 @@
 #if _DEBUG
 	NSLog(@"Foursquare->dealloc");
 #endif
+	[MyConsumerKey release];
+	[MyConsumerSecret release];
 	[lastStatus release];
 	[lastStatusReason release];
 	[dictLastRequest release];
