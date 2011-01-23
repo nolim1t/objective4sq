@@ -163,13 +163,21 @@
 }
 -(void) grabVenueListWithStartDate:(NSDate *)startDate WithEndDate:(NSDate *)endDate {
 	lastEndPoint = [NSString stringWithString:kUserCheckinHistoryEndpoint];
-	NSString *urlString = [NSString stringWithFormat:@"%@%@?oauth_token=%@&beforeTimestamp=%d&afterTimestamp=%d",
+	NSString *urlString = [NSString stringWithFormat:@"%@%@?oauth_token=%@",
 						   kBaseURL,
 						   kUserCheckinHistoryEndpoint,
-						   [self getStoredAccessToken],
-						   (NSInteger )[startDate timeIntervalSince1970],
-						   (NSInteger )[endDate timeIntervalSince1970]
+						   [self getStoredAccessToken]
 						   ];
+	if (startDate != nil) {
+		urlString = [urlString stringByAppendingFormat:@"&afterTimestamp=%d", 
+					 (NSInteger )[startDate timeIntervalSince1970]
+					 ];
+	}
+	if (endDate != nil) {
+		urlString = [urlString stringByAppendingFormat:@"&beforeTimestamp=%d",
+					 (NSInteger )[endDate timeIntervalSince1970]
+					 ];
+	}
 #if _DEBUG
 	NSLog(@"---");
 	NSLog(@"Foursquare->grabVenueListWithStartDate: %@ %@", [startDate description], [endDate description]);
