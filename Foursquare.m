@@ -129,6 +129,7 @@
 #endif	
 	NSURL *theURL = [NSURL URLWithString:urlString];
 	ASIHTTPRequest *theReq = [ASIHTTPRequest requestWithURL:theURL];
+	[theReq setTimeOutSeconds:60];
 	[theReq setDelegate:self];
 	[theReq startAsynchronous];
 	background_job = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{}];
@@ -154,6 +155,7 @@
 #endif
 	NSURL *theURL = [NSURL URLWithString:urlString];
 	ASIHTTPRequest *theReq = [ASIHTTPRequest requestWithURL:theURL];
+	[theReq setTimeOutSeconds:60];
 	[theReq setDelegate:self];
 	[theReq startAsynchronous];
 	background_job = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{}];
@@ -177,6 +179,7 @@
 	
 	NSURL *theURL = [NSURL URLWithString:urlString];
 	ASIHTTPRequest *theReq = [ASIHTTPRequest requestWithURL:theURL];
+	[theReq setTimeOutSeconds:60];
 	[theReq setDelegate:self];
 	[theReq startAsynchronous];
 	
